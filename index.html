@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zenith Focus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        background-color: var(--color-dark-bg);
+        background-attachment: fixed;
+        transition: background-color 0.5s ease;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Space Grotesk', 'sans-serif'],
+            },
+            colors: {
+              'dark-bg': 'var(--color-dark-bg)',
+              'dark-card': 'var(--color-dark-card)',
+              'accent-indigo': 'var(--color-accent-indigo)',
+              'accent-cyan': 'var(--color-accent-cyan)',
+              'accent-glow': 'var(--color-accent-glow)',
+              'electric-blue': 'var(--color-electric-blue)',
+            },
+            keyframes: {
+              'glow': {
+                '0%, 100%': { boxShadow: '0 0 10px -5px var(--color-accent-glow)' },
+                '50%': { boxShadow: '0 0 20px 5px var(--color-accent-glow)' },
+              },
+              'subtle-pulse': {
+                '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                '50%': { transform: 'scale(1.03)', opacity: 0.95 },
+              },
+              'border-glow': {
+                '0%': { 'border-color': 'rgba(0, 191, 255, 0.2)' },
+                '50%': { 'border-color': 'rgba(34, 211, 238, 0.5)' },
+                '100%': { 'border-color': 'rgba(0, 191, 255, 0.2)' },
+              },
+              'dropdown-enter': {
+                '0%': { transform: 'scale(0.95)', opacity: '0' },
+                '100%': { transform: 'scale(1)', opacity: '1' },
+              },
+              'toast-in': {
+                'from': { transform: 'translateX(100%)', opacity: '0' },
+                'to': { transform: 'translateX(0)', opacity: '1' },
+              },
+              'toast-out': {
+                'from': { transform: 'translateX(0)', opacity: '1' },
+                'to': { transform: 'translateX(100%)', opacity: '0' },
+              },
+            },
+            animation: {
+              'glow': 'glow 3s ease-in-out infinite',
+              'subtle-pulse': 'subtle-pulse 5s ease-in-out infinite',
+              'border-glow': 'border-glow 4s linear infinite',
+              'dropdown-enter': 'dropdown-enter 0.1s ease-out',
+              'toast-in': 'toast-in 0.3s ease-out forwards',
+              'toast-out': 'toast-out 0.3s ease-in forwards',
+            },
+          },
+        },
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "recharts": "https://esm.sh/recharts@^3.2.1",
+    "@google/genai": "https://esm.sh/@google/genai@^1.21.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.544.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="dark">
+    <!-- File manifest for the playground -->
+    <script type="application/json" id="import-map-overrides">
+    {
+      "imports": {
+        "index.tsx": "./index.tsx",
+        "App.tsx": "./App.tsx",
+        "types.ts": "./types.ts",
+        "constants.tsx": "./constants.tsx",
+        "hooks/useProductivityData.ts": "./hooks/useProductivityData.ts",
+        "components/ui/Card.tsx": "./components/ui/Card.tsx",
+        "components/PomodoroTimer.tsx": "./components/PomodoroTimer.tsx",
+        "components/Dashboard.tsx": "./components/Dashboard.tsx",
+        "components/Reports.tsx": "./components/Reports.tsx",
+        "components/Social.tsx": "./components/Social.tsx",
+        "services/geminiService.ts": "./services/geminiService.ts",
+        "components/ui/Modal.tsx": "./components/ui/Modal.tsx",
+        "components/TaskMatrix.tsx": "./components/TaskMatrix.tsx",
+        "components/DailyIntel.tsx": "./components/DailyIntel.tsx",
+        "components/SessionLogView.tsx": "./components/SessionLogView.tsx",
+        "hooks/useTimerSettings.ts": "./hooks/useTimerSettings.ts",
+        "components/SettingsModal.tsx": "./components/SettingsModal.tsx",
+        "components/ui/CustomSelect.tsx": "./components/ui/CustomSelect.tsx",
+        "hooks/useToast.ts": "./hooks/useToast.ts",
+        "components/ui/Toast.tsx": "./components/ui/Toast.tsx",
+        "components/ui/CommandPalette.tsx": "./components/ui/CommandPalette.tsx",
+        "components/DistractionModal.tsx": "./components/DistractionModal.tsx",
+        "hooks/useTheme.ts": "./hooks/useTheme.ts",
+        "hooks/useCategoryData.ts": "./hooks/useCategoryData.ts",
+        "components/ui/NumberInput.tsx": "./components/ui/NumberInput.tsx",
+        "hooks/usePomodoro.ts": "./hooks/usePomodoro.ts",
+        "utils/settingsValidator.ts": "./utils/settingsValidator.ts",
+        "utils/mockData.ts": "./utils/mockData.ts",
+        "components/ManualLogModal.tsx": "./components/ManualLogModal.tsx",
+        "hooks/useUserProfile.ts": "./hooks/useUserProfile.ts",
+        "components/Profile.tsx": "./components/Profile.tsx",
+        "components/ui/ConfirmationModal.tsx": "./components/ui/ConfirmationModal.tsx",
+        "components/FloatingTimerPlaceholder.tsx": "./components/FloatingTimerPlaceholder.tsx",
+        "timer.html": "./public/timer.html",
+        "timer-main.tsx": "./timer-main.tsx",
+        "components/PopOutTimerPlaceholder.tsx": "./components/PopOutTimerPlaceholder.tsx"
+      }
+    }
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

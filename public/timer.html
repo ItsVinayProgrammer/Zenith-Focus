@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zenith Focus Timer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        background-color: var(--color-dark-bg);
+        background-attachment: fixed;
+        transition: background-color 0.5s ease;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Space Grotesk', 'sans-serif'],
+            },
+            colors: {
+              'dark-bg': 'var(--color-dark-bg)',
+              'dark-card': 'var(--color-dark-card)',
+              'accent-indigo': 'var(--color-accent-indigo)',
+              'accent-cyan': 'var(--color-accent-cyan)',
+              'accent-glow': 'var(--color-accent-glow)',
+              'electric-blue': 'var(--color-electric-blue)',
+            },
+            keyframes: {
+              'glow': {
+                '0%, 100%': { boxShadow: '0 0 10px -5px var(--color-accent-glow)' },
+                '50%': { boxShadow: '0 0 20px 5px var(--color-accent-glow)' },
+              },
+               'border-glow': {
+                '0%': { 'border-color': 'rgba(0, 191, 255, 0.2)' },
+                '50%': { 'border-color': 'rgba(34, 211, 238, 0.5)' },
+                '100%': { 'border-color': 'rgba(0, 191, 255, 0.2)' },
+              },
+            },
+            animation: {
+              'glow': 'glow 3s ease-in-out infinite',
+              'border-glow': 'border-glow 4s linear infinite',
+            },
+          },
+        },
+      }
+    </script>
+    <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "recharts": "https://esm.sh/recharts@^3.2.1",
+    "@google/genai": "https://esm.sh/@google/genai@^1.21.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.544.0"
+  }
+}
+</script>
+</head>
+  <body class="dark">
+    <div id="root"></div>
+    <script type="module" src="/timer-main.tsx"></script>
+  </body>
+</html>
