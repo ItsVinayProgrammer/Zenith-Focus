@@ -172,6 +172,16 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
                 <PictureInPicture size={18} />
                 </button>
             )}
+            {onDock && !isFloating && (
+                <button 
+                onClick={onDock} 
+                aria-label="Dock timer" 
+                title="Dock timer (Bring back to main window)"
+                className="w-9 h-9 text-gray-400 hover:text-white rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-100"
+                >
+                <ArrowDownToLine size={18} />
+                </button>
+            )}
         </div>
       </div>
         

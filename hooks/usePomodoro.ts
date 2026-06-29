@@ -20,6 +20,7 @@ export interface TimerState {
   pomodoros: number;
   focusStreak: number;
   pendingMode: 'work' | 'shortBreak' | 'longBreak' | null;
+  endTime: number | null;
 }
 
 export const usePomodoro = (
@@ -30,6 +31,19 @@ export const usePomodoro = (
   onDistraction: () => void
 ) => {
   const [timerState, setTimerState] = useState<TimerState>(() => {
+    try {
+      const saved = localStorage.getItem(TIMER_STATE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as TimerState;
+        if (parsed.isActive && parsed.endTime) {
+          const remaining = Math.max(0, Math.ceil((parsed.endTime - Date.now()) / 1000));
+          return { ...parsed, secondsLeft: remaining };
+        }
+        return { ...parsed, endTime: parsed.endTime || null };
+      }
+    } catch (e) {
+      console.error("Error reading initial timer state from localStorage", e);
+    }
     return {
       mode: 'work',
       secondsLeft: settings.work,
@@ -37,6 +51,7 @@ export const usePomodoro = (
       pomodoros: 0,
       focusStreak: 0,
       pendingMode: null,
+      endTime: null,
     };
   });
 
@@ -100,7 +115,7 @@ export const usePomodoro = (
       sessionStartRef.current = new Date();
     }
   }, [addLog, activeTask]);
-  
+
   const switchMode = useCallback((newMode: 'work' | 'shortBreak' | 'longBreak', fromAutoSwitch: boolean = false) => {
     logSession(mode);
     
@@ -122,6 +137,7 @@ export const usePomodoro = (
         pomodoros: newPomodoros,
         focusStreak: newStreak,
         pendingMode: null,
+        endTime: Date.now() + settings[newMode] * 1000,
     });
 
   }, [mode, logSession, pomodoros, focusStreak, activeTask, updateTask, settings]);
@@ -151,6 +167,7 @@ export const usePomodoro = (
         pomodoros: newPomodoros,
         focusStreak: newStreak,
         pendingMode: nextMode,
+        endTime: null,
     }));
 
   }, [logSession, mode, pomodoros, focusStreak, activeTask, updateTask, settings.pomodorosPerLongBreak]);
@@ -171,18 +188,28 @@ export const usePomodoro = (
     }
   }, [mode, pomodoros, focusStreak, switchMode, settings.pomodorosPerLongBreak]);
 
-  // Main timer interval
+  // Main timer interval using timestamps to prevent background throttling issues
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
-    if (isActive && secondsLeft > 0) {
-      interval = setInterval(() => setTimerState(s => ({ ...s, secondsLeft: s.secondsLeft - 1 })), 1000);
+    if (isActive && timerState.endTime) {
+      interval = setInterval(() => {
+        const remaining = Math.max(0, Math.ceil((timerState.endTime! - Date.now()) / 1000));
+        if (remaining === 0) {
+          endSession();
+        } else {
+          setTimerState(s => {
+            if (s.secondsLeft === remaining) return s;
+            return { ...s, secondsLeft: remaining };
+          });
+        }
+      }, 200);
     } else if (isActive && secondsLeft === 0) {
       endSession();
     }
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, secondsLeft, endSession]);
+  }, [isActive, timerState.endTime, secondsLeft, endSession]);
 
   const startPendingSession = useCallback(() => {
     if (!pendingMode) return;
@@ -197,6 +224,7 @@ export const usePomodoro = (
         secondsLeft: settings[s.pendingMode],
         isActive: true,
         pendingMode: null,
+        endTime: Date.now() + settings[s.pendingMode] * 1000,
       };
     });
   }, [pendingMode, settings]);
@@ -204,22 +232,22 @@ export const usePomodoro = (
   const toggleTimer = useCallback(() => {
     if (isActive) { // Pausing
         logSession(mode);
-        setTimerState(s => ({...s, focusStreak: 0, isActive: false })); // Pausing breaks streak and stops timer
+        setTimerState(s => ({...s, focusStreak: 0, isActive: false, endTime: null })); // Pausing breaks streak and stops timer
     } else { // Resuming / Starting
         if(sessionStartRef.current) { // Was paused
             logSession(SessionType.Pause);
         }
         sessionStartRef.current = new Date();
-        setTimerState(s => ({ ...s, isActive: true, pendingMode: null }));
+        const duration = secondsLeft;
+        setTimerState(s => ({ ...s, isActive: true, pendingMode: null, endTime: Date.now() + duration * 1000 }));
     }
-  }, [isActive, mode, logSession]);
+  }, [isActive, mode, logSession, secondsLeft]);
   
   const resetTimer = useCallback(() => {
     if (sessionStartRef.current) {
         logSession(mode);
     }
     sessionStartRef.current = null;
-    // Reset to the initial state
     setTimerState({
       mode: 'work',
       secondsLeft: settings.work,
@@ -227,6 +255,7 @@ export const usePomodoro = (
       pomodoros: 0,
       focusStreak: 0,
       pendingMode: null,
+      endTime: null,
     });
   }, [mode, logSession, settings.work]);
 
@@ -241,6 +270,7 @@ export const usePomodoro = (
                 isActive: true,
                 focusStreak: 0, // Skipping a break resets the streak
                 pendingMode: null,
+                endTime: Date.now() + settings.work * 1000,
             }));
         } else {
             startPendingSession();
@@ -249,6 +279,35 @@ export const usePomodoro = (
     }
     handleNext(true);
   }, [handleNext, pendingMode, startPendingSession, settings.work]);
+
+  // Synchronize timer state changes across multiple tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === TIMER_STATE_KEY && e.newValue) {
+        try {
+          const newState = JSON.parse(e.newValue) as TimerState;
+          setTimerState(prev => {
+            if (
+              prev.mode === newState.mode &&
+              prev.secondsLeft === newState.secondsLeft &&
+              prev.isActive === newState.isActive &&
+              prev.pomodoros === newState.pomodoros &&
+              prev.focusStreak === newState.focusStreak &&
+              prev.pendingMode === newState.pendingMode &&
+              prev.endTime === newState.endTime
+            ) {
+              return prev;
+            }
+            return newState;
+          });
+        } catch (err) {
+          console.error("Error synchronizing timer state across tabs", err);
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Command listener for pop-out window
   useEffect(() => {
@@ -269,6 +328,9 @@ export const usePomodoro = (
                     case 'startPending':
                         startPendingSession();
                         break;
+                    case 'endSession':
+                        endSession();
+                        break;
                 }
             } catch (err) {
                 console.error("Error processing timer command", err);
@@ -277,7 +339,7 @@ export const usePomodoro = (
     };
     window.addEventListener('storage', handleCommand);
     return () => window.removeEventListener('storage', handleCommand);
-  }, [toggleTimer, skipSession, resetTimer, startPendingSession]); 
+  }, [toggleTimer, skipSession, resetTimer, startPendingSession, endSession]); 
 
   return {
     timerState,
@@ -287,3 +349,4 @@ export const usePomodoro = (
     startPendingSession,
   };
 };
+  

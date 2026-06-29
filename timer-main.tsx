@@ -33,6 +33,7 @@ const PopOutApp: React.FC = () => {
         pomodoros: 0,
         focusStreak: 0,
         pendingMode: null,
+        endTime: null,
     }));
     
     const [settings, setSettings] = useState(() => {
@@ -84,7 +85,28 @@ const PopOutApp: React.FC = () => {
         return () => window.removeEventListener('storage', handleStorage);
     }, []);
 
-    const sendCommand = (command: 'toggle' | 'skip' | 'reset' | 'startPending') => {
+    const { isActive, endTime } = timerState;
+    useEffect(() => {
+        let interval: ReturnType<typeof setInterval> | null = null;
+        if (isActive && endTime) {
+            interval = setInterval(() => {
+                const remaining = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+                if (remaining === 0) {
+                    sendCommand('endSession');
+                } else {
+                    setTimerState(s => {
+                        if (s.secondsLeft === remaining) return s;
+                        return { ...s, secondsLeft: remaining };
+                    });
+                }
+            }, 200);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [isActive, endTime]);
+
+    const sendCommand = (command: 'toggle' | 'skip' | 'reset' | 'startPending' | 'endSession') => {
         localStorage.setItem(TIMER_COMMAND_KEY, JSON.stringify({ command, timestamp: Date.now() }));
     };
 
@@ -98,6 +120,7 @@ const PopOutApp: React.FC = () => {
                 skipSession={() => sendCommand('skip')}
                 resetTimer={() => sendCommand('reset')}
                 startPendingSession={() => sendCommand('startPending')}
+                onDock={() => window.close()}
             />
         </div>
     );
