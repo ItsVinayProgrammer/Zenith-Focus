@@ -11,6 +11,9 @@ Zenith Focus is a React + Vite + TypeScript system that turns session telemetry 
 - AI-powered Daily Intel from structured work-session metadata
 - Eisenhower task matrix + gamified progression loops
 
+<img width="1831" height="992" alt="image" src="https://github.com/user-attachments/assets/91a7d7f5-c56e-455d-b1de-abae63c23f0c" />
+
+
 ## Core Experience
 
 Zenith Focus ships as a modular productivity cockpit:
