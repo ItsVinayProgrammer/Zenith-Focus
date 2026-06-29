@@ -10,7 +10,8 @@ if (!process.env.API_KEY) {
   console.warn("API_KEY environment variable not set. Gemini API calls will fail.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+const apiKey = process.env.API_KEY || 'DUMMY_KEY';
+const ai = new GoogleGenAI({ apiKey });
 
 interface InsightsPayload {
   logs: SessionLog[]; // Expects pre-filtered logs

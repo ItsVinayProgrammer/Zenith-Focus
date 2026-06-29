@@ -38,7 +38,7 @@ const App: React.FC = () => {
   const [isDistractionModalOpen, setIsDistractionModalOpen] = useState(false);
   const [isTimerFloating, setIsTimerFloating] = useState(false);
   const [isTimerPoppedOut, setIsTimerPoppedOut] = useState(false);
-  
+
   const { toasts, addToast, removeToast } = useToast();
 
   const { settings, updateSettings } = useTimerSettings();
@@ -59,9 +59,9 @@ const App: React.FC = () => {
     goals,
     updateGoal,
   } = useProductivityData();
-  
+
   const activeTask = useMemo(() => tasks.find(t => t.status === 'in_progress'), [tasks]);
-  
+
   const todayLogs = useMemo(() => {
     const today = new Date().toDateString();
     return logs.filter(log => new Date(log.startTime).toDateString() === today);
@@ -78,8 +78,8 @@ const App: React.FC = () => {
     });
     const fallbackCategory = DEFAULT_CATEGORIES[0] || { name: 'Work', color: '#3B82F6', icon: 'Briefcase' };
     map['fallback'] = {
-        color: fallbackCategory.color,
-        icon: ICONS[fallbackCategory.icon] || ICONS['Tag']
+      color: fallbackCategory.color,
+      icon: ICONS[fallbackCategory.icon] || ICONS['Tag']
     };
     return map;
   }, [categories]);
@@ -102,19 +102,19 @@ const App: React.FC = () => {
     updateTask,
     () => setIsDistractionModalOpen(true)
   );
-  
+
   // Floating Timer Drag Logic
   const [floatingPosition, setFloatingPosition] = useState({ x: 20, y: window.innerHeight - 450 });
   const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
-  
+
   // Pop-out Timer Logic
   const popOutWindowRef = useRef<Window | null>(null);
-  
+
   const handlePopOut = useCallback(() => {
     if (popOutWindowRef.current && !popOutWindowRef.current.closed) {
-        popOutWindowRef.current.focus();
-        return;
+      popOutWindowRef.current.focus();
+      return;
     }
     const windowFeatures = 'menubar=no,location=no,resizable=no,scrollbars=no,status=no,width=380,height=520';
     popOutWindowRef.current = window.open('/timer.html', 'zenithFocusTimer', windowFeatures);
@@ -123,8 +123,8 @@ const App: React.FC = () => {
 
   const handlePopIn = useCallback(() => {
     if (popOutWindowRef.current) {
-        popOutWindowRef.current.close();
-        popOutWindowRef.current = null;
+      popOutWindowRef.current.close();
+      popOutWindowRef.current = null;
     }
     setIsTimerPoppedOut(false);
   }, []);
@@ -140,13 +140,13 @@ const App: React.FC = () => {
   }, []);
 
   const handleDragMouseDown = useCallback((e: React.MouseEvent) => {
-      setIsDragging(true);
-      dragOffset.current = {
-        x: e.clientX - floatingPosition.x,
-        y: e.clientY - floatingPosition.y,
-      };
-      // Prevent text selection on drag
-      e.preventDefault();
+    setIsDragging(true);
+    dragOffset.current = {
+      x: e.clientX - floatingPosition.x,
+      y: e.clientY - floatingPosition.y,
+    };
+    // Prevent text selection on drag
+    e.preventDefault();
   }, [floatingPosition]);
 
   useEffect(() => {
@@ -158,22 +158,22 @@ const App: React.FC = () => {
     };
 
     const handleMouseUp = () => {
-        setIsDragging(false);
+      setIsDragging(false);
     };
 
     if (isDragging) {
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        document.body.style.userSelect = 'none';
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = 'none';
     }
 
     return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-        document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = '';
     };
   }, [isDragging]);
-  
+
 
   const handleSetView = useCallback((view: 'focus' | 'analytics' | 'social' | 'profile') => {
     setActiveView(view);
@@ -188,7 +188,7 @@ const App: React.FC = () => {
   const handleToggleZenMode = useCallback(() => {
     setIsZenMode(prev => !prev);
     setCommandPaletteOpen(false);
-    addToast(`Zen Mode ${!isZenMode ? 'enabled' : 'disabled'}.`, { icon: isZenMode ? <Eye/> : <EyeOff /> });
+    addToast(`Zen Mode ${!isZenMode ? 'enabled' : 'disabled'}.`, { icon: isZenMode ? <Eye /> : <EyeOff /> });
   }, [isZenMode, addToast]);
 
   const handleToggleTimer = useCallback(() => {
@@ -196,7 +196,7 @@ const App: React.FC = () => {
     addToast('Timer toggled.', { icon: <Play /> });
     setCommandPaletteOpen(false);
   }, [addToast, toggleTimer]);
-  
+
   const handleSkipSession = useCallback(() => {
     skipSession();
     addToast('Session skipped.', { icon: <SkipForward /> });
@@ -213,13 +213,13 @@ const App: React.FC = () => {
     setIsDistractionModalOpen(false);
     addToast('Distraction logged. Stay focused!', { icon: <Zap /> });
   };
-  
+
   const handleLoadTestData = useCallback(() => {
     const { tasks, logs, distractions } = generateMockData();
     localStorage.setItem('tasks', JSON.stringify(tasks));
     localStorage.setItem('logs', JSON.stringify(logs));
     localStorage.setItem('distractions', JSON.stringify(distractions));
-    
+
     addToast('Test data loaded. App will now reload.', { icon: <Database />, type: 'success' });
 
     setTimeout(() => {
@@ -227,7 +227,7 @@ const App: React.FC = () => {
     }, 1500);
     setCommandPaletteOpen(false);
   }, [addToast]);
-  
+
   const handleToggleFloat = useCallback(() => {
     setIsTimerFloating(prev => !prev);
     setCommandPaletteOpen(false);
@@ -242,18 +242,18 @@ const App: React.FC = () => {
         e.preventDefault();
         setCommandPaletteOpen(prev => !prev);
       }
-      
+
       const isInputFocused = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
       if (isSettingsModalOpen || isCommandPaletteOpen || isInputFocused || isDistractionModalOpen) {
-          if (e.key === 'Escape') {
-              setIsSettingsModalOpen(false);
-              setCommandPaletteOpen(false);
-              setIsDistractionModalOpen(false);
-          }
-          return;
+        if (e.key === 'Escape') {
+          setIsSettingsModalOpen(false);
+          setCommandPaletteOpen(false);
+          setIsDistractionModalOpen(false);
+        }
+        return;
       }
-      
-      switch(e.key.toLowerCase()) {
+
+      switch (e.key.toLowerCase()) {
         case 't':
           handleToggleTimer();
           break;
@@ -270,11 +270,11 @@ const App: React.FC = () => {
           if (e.shiftKey) handleOpenSettings();
           break;
         case 'a':
-            if (e.shiftKey) handleSetView('analytics');
-            break;
+          if (e.shiftKey) handleSetView('analytics');
+          break;
         case 'l':
-            if (e.shiftKey) handleSetView('social');
-            break;
+          if (e.shiftKey) handleSetView('social');
+          break;
       }
     };
 
@@ -307,16 +307,15 @@ const App: React.FC = () => {
       <Icon className="w-6 h-6" />
     </button>
   );
-  
+
   const NavButton = ({ icon: Icon, label, onClick, isActive }: { icon: React.ElementType, label: string, onClick: () => void, isActive: boolean }) => (
     <button
-        onClick={onClick}
-        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 active:scale-95 ${
-            isActive ? 'bg-electric-blue text-white shadow' : 'text-gray-400 hover:bg-white/10 hover:text-white'
+      onClick={onClick}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 active:scale-95 ${isActive ? 'bg-electric-blue text-white shadow' : 'text-gray-400 hover:bg-white/10 hover:text-white'
         }`}
     >
-        <Icon size={18} />
-        <span>{label}</span>
+      <Icon size={18} />
+      <span>{label}</span>
     </button>
   );
 
@@ -332,88 +331,88 @@ const App: React.FC = () => {
       <div className="container mx-auto px-4 py-6">
         {/* Header and Navigation */}
         <header className="flex justify-between items-center mb-8">
-            <div className="flex items-center gap-3 zen-fade">
-                <div className="w-10 h-10 bg-gradient-to-br from-accent-indigo to-accent-cyan rounded-full flex items-center justify-center">
-                    <Bot className="text-white w-6 h-6"/>
-                </div>
-                <h1 className="text-2xl font-bold text-white tracking-wider font-display">Zenith Focus</h1>
+          <div className="flex items-center gap-3 zen-fade">
+            <div className="w-10 h-10 bg-gradient-to-br from-accent-indigo to-accent-cyan rounded-full flex items-center justify-center">
+              <Bot className="text-white w-6 h-6" />
             </div>
-            
-             {/* Middle: Main Navigation */}
-            <div className="flex items-center gap-1 p-1 bg-dark-card rounded-xl zen-fade">
-                <NavButton icon={Focus} label="Focus" onClick={() => setActiveView('focus')} isActive={activeView === 'focus'} />
-                <NavButton icon={BarChart3} label="Analytics" onClick={() => setActiveView('analytics')} isActive={activeView === 'analytics'} />
-                <NavButton icon={Users} label="Alliances" onClick={() => setActiveView('social')} isActive={activeView === 'social'} />
-                <NavButton icon={User} label="Profile" onClick={() => setActiveView('profile')} isActive={activeView === 'profile'} />
+            <h1 className="text-2xl font-bold text-white tracking-wider font-display">Zenith Focus</h1>
+          </div>
+
+          {/* Middle: Main Navigation */}
+          <div className="flex items-center gap-1 p-1 bg-dark-card rounded-xl zen-fade">
+            <NavButton icon={Focus} label="Focus" onClick={() => setActiveView('focus')} isActive={activeView === 'focus'} />
+            <NavButton icon={BarChart3} label="Analytics" onClick={() => setActiveView('analytics')} isActive={activeView === 'analytics'} />
+            <NavButton icon={Users} label="Alliances" onClick={() => setActiveView('social')} isActive={activeView === 'social'} />
+            <NavButton icon={User} label="Profile" onClick={() => setActiveView('profile')} isActive={activeView === 'profile'} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="zen-fade flex items-center gap-2">
+              <HeaderButton icon={Settings} label="Settings" onClick={() => setIsSettingsModalOpen(true)} shortcut="Shift+," />
             </div>
-            
-            <div className="flex items-center gap-2">
-                <div className="zen-fade flex items-center gap-2">
-                    <HeaderButton icon={Settings} label="Settings" onClick={() => setIsSettingsModalOpen(true)} shortcut="Shift+," />
-                </div>
-                <HeaderButton icon={isZenMode ? EyeOff : Eye} label={isZenMode ? "Exit Zen Mode" : "Enter Zen Mode"} onClick={handleToggleZenMode} shortcut="Z" />
-            </div>
+            <HeaderButton icon={isZenMode ? EyeOff : Eye} label={isZenMode ? "Exit Zen Mode" : "Enter Zen Mode"} onClick={handleToggleZenMode} shortcut="Z" />
+          </div>
         </header>
-        
+
         {/* Main Content */}
         <main>
-           {activeView === 'focus' && (
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                  <div className="lg:col-span-3">
-                    {isTimerPoppedOut ? (
-                      <PopOutTimerPlaceholder onPopIn={handlePopIn} />
-                    ) : isTimerFloating ? (
-                      <FloatingTimerPlaceholder onDock={() => setIsTimerFloating(false)} />
-                    ) : (
-                      <PomodoroTimer
-                        timerState={timerState}
-                        settings={timerSettingsInSeconds}
-                        activeTask={activeTask}
-                        toggleTimer={toggleTimer}
-                        skipSession={skipSession}
-                        resetTimer={resetTimer}
-                        startPendingSession={startPendingSession}
-                        onPopOut={handlePopOut}
-                        onToggleFloating={() => setIsTimerFloating(true)}
-                        isZenMode={isZenMode}
-                      />
-                    )}
-                  </div>
-                  <div className="lg:col-span-2 zen-fade">
-                      <MissionControl 
-                          tasks={tasks} 
-                          addTask={addTask} 
-                          updateTask={updateTask} 
-                          deleteTask={deleteTask} 
-                          reorderTasks={reorderTasks}
-                          logs={todayLogs} 
-                          addLog={addLog}
-                          isAddTaskFormVisible={isAddTaskFormVisible}
-                          setAddTaskFormVisible={setAddTaskFormVisible}
-                          categories={categories}
-                          categoryMap={categoryMap}
-                      />
-                  </div>
+          {activeView === 'focus' && (
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+              <div className="lg:col-span-3">
+                {isTimerPoppedOut ? (
+                  <PopOutTimerPlaceholder onPopIn={handlePopIn} />
+                ) : isTimerFloating ? (
+                  <FloatingTimerPlaceholder onDock={() => setIsTimerFloating(false)} />
+                ) : (
+                  <PomodoroTimer
+                    timerState={timerState}
+                    settings={timerSettingsInSeconds}
+                    activeTask={activeTask}
+                    toggleTimer={toggleTimer}
+                    skipSession={skipSession}
+                    resetTimer={resetTimer}
+                    startPendingSession={startPendingSession}
+                    onPopOut={handlePopOut}
+                    onToggleFloating={() => setIsTimerFloating(true)}
+                    isZenMode={isZenMode}
+                  />
+                )}
               </div>
-           )}
-           {activeView === 'analytics' && (
-              <Reports logs={logs} distractions={distractions} tasks={tasks} categoryMap={categoryMap} categories={categories} />
-           )}
-           {activeView === 'social' && (
-              <Social logs={logs} tasks={tasks} goals={goals} updateGoal={updateGoal} addToast={addToast} categoryMap={categoryMap} />
-           )}
-           {activeView === 'profile' && (
-              <Profile 
-                profile={profile}
-                updateProfile={updateProfile}
-                logs={logs}
-                tasks={tasks}
-                categories={categories}
-                addToast={addToast}
-                addTask={addTask}
-                openSettings={() => setIsSettingsModalOpen(true)}
-              />
-           )}
+              <div className="lg:col-span-2 zen-fade">
+                <MissionControl
+                  tasks={tasks}
+                  addTask={addTask}
+                  updateTask={updateTask}
+                  deleteTask={deleteTask}
+                  reorderTasks={reorderTasks}
+                  logs={todayLogs}
+                  addLog={addLog}
+                  isAddTaskFormVisible={isAddTaskFormVisible}
+                  setAddTaskFormVisible={setAddTaskFormVisible}
+                  categories={categories}
+                  categoryMap={categoryMap}
+                />
+              </div>
+            </div>
+          )}
+          {activeView === 'analytics' && (
+            <Reports logs={logs} distractions={distractions} tasks={tasks} categoryMap={categoryMap} categories={categories} />
+          )}
+          {activeView === 'social' && (
+            <Social logs={logs} tasks={tasks} goals={goals} updateGoal={updateGoal} addToast={addToast} categoryMap={categoryMap} />
+          )}
+          {activeView === 'profile' && (
+            <Profile
+              profile={profile}
+              updateProfile={updateProfile}
+              logs={logs}
+              tasks={tasks}
+              categories={categories}
+              addToast={addToast}
+              addTask={addTask}
+              openSettings={() => setIsSettingsModalOpen(true)}
+            />
+          )}
         </main>
       </div>
 
@@ -441,7 +440,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <CommandPalette 
+      <CommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
         actions={commandActions}
